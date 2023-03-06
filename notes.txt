@@ -2,3 +2,28 @@ superuser:
  Username: admin
  Email: admin@littlelemon.com
  Password: lemon@789!
+
+
+ Users (delivery crew) 
+ Username: anna
+ Password: lemon@789!
+ Username: Ryan
+ Password: lemon@789!
+
+ Users (Manager)
+ Username: michael
+ Password: lemon@789!
+ Username: mikasa
+ Password: lemon@789!
+
+
+ Users (Customer - not in Group)
+ Username: jan
+ Password: lemon@789!
+ Username: eren
+ Password: lemon@789!
+ 
+
+
+
+
