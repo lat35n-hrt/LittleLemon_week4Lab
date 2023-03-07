@@ -28,6 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -147,3 +149,6 @@ REST_FRAMEWORK = {
 DJOSER = {
     "USER_ID_FIELED":"username"
 }
+
+
+MANAGER_GROUP_NAME = 'Manager'
