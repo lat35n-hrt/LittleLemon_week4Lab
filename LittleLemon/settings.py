@@ -152,3 +152,4 @@ DJOSER = {
 
 
 MANAGER_GROUP_NAME = 'Manager'
+DELIVERYCREW_GROUP_NAME = 'Delivery crew'
