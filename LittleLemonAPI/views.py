@@ -12,7 +12,7 @@ from .permissions import IsManager
 class ManagerUserList(generics.ListCreateAPIView):
 
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsManager]
 
     def get_queryset(self):        
         return User.objects.filter(groups__name=settings.MANAGER_GROUP_NAME)
