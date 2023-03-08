@@ -53,9 +53,24 @@ class ManagerUserDetail(generics.RetrieveDestroyAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class DeliveryCrewUserList(APIView):
-    ()
+class DeliveryCrewUserList(generics.ListCreateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsManager]
+
+    def get_queryset(self):        
+        return User.objects.filter(groups__name=settings.DELIVERYCREW_GROUP_NAME)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            deliverycrew_group = Group.objects.get(name=settings.DELIVERYCREW_GROUP_NAME)
+            deliverycrew_group.user_set.add(user)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DeliveryCrewUserDetail(APIView):
+class DeliveryCrewUserDetail(generics.ListCreateAPIView):
     ()
