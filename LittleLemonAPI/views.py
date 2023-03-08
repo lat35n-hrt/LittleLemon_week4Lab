@@ -16,11 +16,6 @@ class ManagerUserList(generics.ListCreateAPIView):
 
     def get_queryset(self):        
         return User.objects.filter(groups__name=settings.MANAGER_GROUP_NAME)
-        # return User.objects.filter(groups__name='Manager')
-    
-        # manager_group = Group.objects.get(name='Manager')
-        # return User.objects.filter(groups=manager_group)
-
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
