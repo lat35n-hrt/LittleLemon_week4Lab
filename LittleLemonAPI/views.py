@@ -73,4 +73,21 @@ class DeliveryCrewUserList(generics.ListCreateAPIView):
 
 
 class DeliveryCrewUserDetail(generics.ListCreateAPIView):
-    ()
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsManager]
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        print(pk)
+        user = get_object_or_404(User, pk=pk)
+        deliverycrew_group = Group.objects.get(name=settings.DELIVERYCREW_GROUP_NAME)
+        if not user.groups.filter(pk=deliverycrew_group.pk).exists():
+            raise get_object_or_404
+        return user
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        deliverycrew_group = Group.objects.get(name=settings.DELIVERYCREW_GROUP_NAME)
+        deliverycrew_group.user_set.remove(user)
+        return Response(status=status.HTTP_200_OK)
