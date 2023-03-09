@@ -72,7 +72,7 @@ class DeliveryCrewUserList(generics.ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DeliveryCrewUserDetail(generics.ListCreateAPIView):
+class DeliveryCrewUserDetail(generics.RetrieveDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsManager]
