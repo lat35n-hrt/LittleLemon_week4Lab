@@ -5,8 +5,8 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ParseError
-from .models import MenuItem
-from .serializers import UserSerializer, MenuItemSerializer
+from .models import MenuItem, Category
+from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer
 from .permissions import IsManager
 
 
@@ -126,3 +126,19 @@ class MenuItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+class CategoryList(generics.ListCreateAPIView):
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated, IsManager]
+
+    def get_queryset(self):
+        return Category.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
