@@ -1,5 +1,4 @@
-from rest_framework.permissions import BasePermission
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from django.conf import settings
 
 class IsManager(BasePermission):
