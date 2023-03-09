@@ -4,7 +4,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from rest_framework.exceptions import NotFound, ParseError
+from .models import MenuItem
+from .serializers import UserSerializer, MenuItemSerializer
 from .permissions import IsManager
 
 
@@ -90,3 +92,37 @@ class DeliveryCrewUserDetail(generics.RetrieveDestroyAPIView):
         deliverycrew_group = Group.objects.get(name=settings.DELIVERYCREW_GROUP_NAME)
         deliverycrew_group.user_set.remove(user)
         return Response(status=status.HTTP_200_OK)
+
+
+class MenuItemList(generics.ListCreateAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    permission_classes = [IsAuthenticated, IsManager]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=201, headers=headers)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class MenuItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    permission_classes = [IsAuthenticated, IsManager]
+
+    def get_object(self):
+        try:
+            return MenuItem.objects.get(id=self.kwargs['pk'])
+        except MenuItem.DoesNotExist:
+            raise NotFound()
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
