@@ -97,7 +97,13 @@ class DeliveryCrewUserDetail(generics.RetrieveDestroyAPIView):
 class MenuItemList(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
-    permission_classes = [IsAuthenticated, IsManager]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, IsManager]
+        return permission_classes 
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
