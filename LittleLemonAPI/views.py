@@ -110,7 +110,13 @@ class MenuItemList(generics.ListCreateAPIView):
 class MenuItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
-    permission_classes = [IsAuthenticated, IsManager]
+  
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, IsManager]
+        return permission_classes 
 
     def get_object(self):
         try:
@@ -130,7 +136,13 @@ class MenuItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated, IsManager]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, IsManager]
+        return permission_classes 
 
     def get_queryset(self):
         return Category.objects.all()
