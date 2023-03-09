@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ParseError
 from .models import MenuItem, Category
 from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer
-from .permissions import IsManager
+from .permissions import IsManager, get_permissions
 
 
 class ManagerUserList(generics.ListCreateAPIView):
@@ -99,11 +99,7 @@ class MenuItemList(generics.ListCreateAPIView):
     serializer_class = MenuItemSerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [IsAuthenticated, IsManager]
-        return permission_classes 
+        return get_permissions(self)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -118,11 +114,7 @@ class MenuItemDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MenuItemSerializer
   
     def get_permissions(self):
-        if self.request.method == 'GET':
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [IsAuthenticated, IsManager]
-        return permission_classes 
+        return get_permissions(self)
 
     def get_object(self):
         try:
@@ -144,11 +136,7 @@ class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [IsAuthenticated, IsManager]
-        return permission_classes 
+        return get_permissions(self)
 
     def get_queryset(self):
         return Category.objects.all()
