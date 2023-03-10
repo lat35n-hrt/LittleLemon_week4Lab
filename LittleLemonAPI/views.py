@@ -99,12 +99,7 @@ class MenuItemList(generics.ListCreateAPIView):
     serializer_class = MenuItemSerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [IsAuthenticated, IsManager]
-        return [permission() for permission in permission_classes]
-
+        return get_permissions(self)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

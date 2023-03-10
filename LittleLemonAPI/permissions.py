@@ -10,4 +10,4 @@ def get_permissions(self):
         permission_classes = [IsAuthenticated]
     else:
         permission_classes = [IsAuthenticated, IsManager]
-    return permission_classes
+    return [permission() for permission in permission_classes]
