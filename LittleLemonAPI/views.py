@@ -1,12 +1,14 @@
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ParseError
-from .models import MenuItem, Category, Cart
-from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer, CartSerializer
+from .models import MenuItem, Category, Cart, Order, OrderItem
+from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer, CartSerializer, OrderSerializer
 from .permissions import IsManager, get_permissions
 
 
@@ -164,3 +166,46 @@ class CartMenuItems(generics.ListCreateAPIView):
         cart_items = Cart.objects.filter(user=request.user)
         cart_items.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class OrderList(generics.ListCreateAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+    def create_order(self, request):
+
+        cart_items = Cart.objects.filter(user=request.user)
+        order = Order.objects.create(user=request.user, total=0, status=False)
+        
+        for cart_item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                menuitem=cart_item.menuitem,
+                quantity=cart_item.quantity,
+                unit_price=cart_item.menuitem.price,
+                price=cart_item.quantity * cart_item.menuitem.price
+            )
+
+        order.total = sum(item.price for item in order.orderitem_set.all())
+        order.save()
+
+        cart_items.delete()
+
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+
+
+class OrderDetail(generics.RetrieveAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        try:
+            order = Order.objects.get(pk=self.kwargs['pk'])
+        except Order.DoesNotExist:
+            raise Http404("Order does not exist.")
+        if order.user != self.request.user:
+            raise PermissionDenied("You don't have permission to access this order.", code=404)
+        return order
