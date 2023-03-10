@@ -5,8 +5,8 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ParseError
-from .models import MenuItem, Category
-from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer
+from .models import MenuItem, Category, Cart
+from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer, CartSerializer
 from .permissions import IsManager, get_permissions
 
 
@@ -99,7 +99,12 @@ class MenuItemList(generics.ListCreateAPIView):
     serializer_class = MenuItemSerializer
 
     def get_permissions(self):
-        return get_permissions(self)
+        if self.request.method == 'GET':
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthenticated, IsManager]
+        return [permission() for permission in permission_classes]
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -136,7 +141,7 @@ class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
 
     def get_permissions(self):
-        return get_permissions(self)
+        return get_permissions(self, self)
 
     def get_queryset(self):
         return Category.objects.all()
@@ -148,3 +153,19 @@ class CategoryList(generics.ListCreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CartMenuItems(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CartSerializer
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        cart_items = Cart.objects.filter(user=request.user)
+        cart_items.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
