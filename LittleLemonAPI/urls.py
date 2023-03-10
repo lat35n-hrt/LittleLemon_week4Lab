@@ -10,4 +10,6 @@ urlpatterns = [
     path('menu-items/<int:pk>', views.MenuItemDetail.as_view()),
     path('categories', views.CategoryList.as_view()),
     path('api/cart/menu-items', views.CartMenuItems.as_view(),),
+    path('api/orders', views.OrderList.as_view()),
+    path('api/orders/<int:pk>', views.OrderDetail.as_view()),
 ]
