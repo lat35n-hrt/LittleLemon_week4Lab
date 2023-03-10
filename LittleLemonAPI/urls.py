@@ -9,4 +9,5 @@ urlpatterns = [
     path('menu-items', views.MenuItemList.as_view()),
     path('menu-items/<int:pk>', views.MenuItemDetail.as_view()),
     path('categories', views.CategoryList.as_view()),
+    path('api/cart/menu-items', views.CartMenuItems.as_view(),),
 ]
