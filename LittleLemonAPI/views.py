@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ParseError
 from .models import MenuItem, Category, Cart, Order, OrderItem
-from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer, CartSerializer, OrderSerializer
+from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer, CartSerializer, OrderSerializer, OrderItemSerializer
 from .permissions import IsManager, get_permissions
 
 
@@ -178,7 +178,7 @@ class OrderList(generics.ListCreateAPIView):
 
         cart_items = Cart.objects.filter(user=request.user)
         order = Order.objects.create(user=request.user, total=0, status=False)
-        
+
         for cart_item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -197,9 +197,12 @@ class OrderList(generics.ListCreateAPIView):
         return Response(serializer.data)
 
 
-class OrderDetail(generics.RetrieveAPIView):
+class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        return get_permissions(self, self)
+    # No need for Customer to PUT and PATCH here
 
     def get_object(self):
         try:
@@ -209,3 +212,40 @@ class OrderDetail(generics.RetrieveAPIView):
         if order.user != self.request.user:
             raise PermissionDenied("You don't have permission to access this order.", code=404)
         return order
+
+
+    def put(self, request, *args, **kwargs):
+        delivery_crew_id = request.data.get('delivery_crew')
+        if delivery_crew_id:
+            try:
+                delivery_crew = User.objects.get(pk=delivery_crew_id)
+            except User.DoesNotExist:
+                return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
+            self.get_object().delivery_crew = delivery_crew
+            if self.get_object().status == 0:
+                self.get_object().status = 1
+        else:
+            self.get_object().status = request.data.get('status', self.get_object().status)
+        self.get_object().save()
+        return Response(self.serializer_class(self.get_object()).data)
+
+
+    def patch(self, request, *args, **kwargs):
+        delivery_crew_id = request.data.get('delivery_crew')
+        if delivery_crew_id:
+            try:
+                delivery_crew = User.objects.get(pk=delivery_crew_id)
+            except User.DoesNotExist:
+                return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
+            self.get_object().delivery_crew = delivery_crew
+        self.get_object().status = request.data.get('status', self.get_object().status)
+        if self.get_object().status == 0:
+            self.get_object().status = 1
+        self.get_object().save()
+        return Response(self.serializer_class(self.get_object()).data)
+
+
+    def delete(self, request, *args, **kwargs):
+        order = self.get_object()
+        order.delete()
+        return Response({"detail": "Order deleted successfully."}, status=status.HTTP_204_NO_CONTENT)    
