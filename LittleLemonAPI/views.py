@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ParseError
 from .models import MenuItem, Category, Cart, Order, OrderItem
 from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer, CartSerializer, OrderSerializer, OrderItemSerializer
-from .permissions import IsManager, get_permissions
+from .permissions import IsManager, get_permissions, IsDeliveryCrew
 
 
 class ManagerUserList(generics.ListCreateAPIView):
@@ -199,53 +199,77 @@ class OrderList(generics.ListCreateAPIView):
 
 class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
-    
-    def get_permissions(self):
-        return get_permissions(self, self)
+    permission_classes = [IsAuthenticated]
     # No need for Customer to PUT and PATCH here
 
     def get_object(self):
-        try:
-            order = Order.objects.get(pk=self.kwargs['pk'])
-        except Order.DoesNotExist:
-            raise Http404("Order does not exist.")
-        if order.user != self.request.user:
-            raise PermissionDenied("You don't have permission to access this order.", code=404)
-        return order
-
+        if IsManager().has_permission(self.request, self):
+            try:
+                order = Order.objects.get(pk=self.kwargs['pk'])
+            except Order.DoesNotExist:
+                raise Http404("Order does not exist.")
+            # if order.user != self.request.user:
+            #     raise PermissionDenied("You don't have permission to access this order.", code=404)
+            return order
+        elif IsDeliveryCrew().has_permission(self.request, self):
+            pass
+        else:
+        #isCustomer    
+            try:
+                order = Order.objects.get(pk=self.kwargs['pk'])
+            except Order.DoesNotExist:
+                raise Http404("Order does not exist.")
+            if order.user != self.request.user:
+                raise PermissionDenied("You don't have permission to access this order.", code=404)
+            return order
 
     def put(self, request, *args, **kwargs):
-        delivery_crew_id = request.data.get('delivery_crew')
-        if delivery_crew_id:
-            try:
-                delivery_crew = User.objects.get(pk=delivery_crew_id)
-            except User.DoesNotExist:
-                return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
-            self.get_object().delivery_crew = delivery_crew
-            if self.get_object().status == 0:
-                self.get_object().status = 1
+        if IsManager().has_permission(request, self):
+            delivery_crew_id = request.data.get('delivery_crew')
+            if delivery_crew_id:
+                try:
+                    delivery_crew = User.objects.get(pk=delivery_crew_id)
+                except User.DoesNotExist:
+                    return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
+                self.get_object().delivery_crew = delivery_crew
+                if self.get_object().status == 0:
+                    self.get_object().status = 1
+            else:
+                self.get_object().status = request.data.get('status', self.get_object().status)
+            self.get_object().save()
+            return Response(self.serializer_class(self.get_object()).data)
         else:
-            self.get_object().status = request.data.get('status', self.get_object().status)
-        self.get_object().save()
-        return Response(self.serializer_class(self.get_object()).data)
-
+            return Response({'message': 'Access denied'})
 
     def patch(self, request, *args, **kwargs):
-        delivery_crew_id = request.data.get('delivery_crew')
-        if delivery_crew_id:
-            try:
-                delivery_crew = User.objects.get(pk=delivery_crew_id)
-            except User.DoesNotExist:
-                return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
-            self.get_object().delivery_crew = delivery_crew
-        self.get_object().status = request.data.get('status', self.get_object().status)
-        if self.get_object().status == 0:
-            self.get_object().status = 1
-        self.get_object().save()
-        return Response(self.serializer_class(self.get_object()).data)
-
+        if IsManager().has_permission(request, self):
+            delivery_crew_id = request.data.get('delivery_crew')
+            if delivery_crew_id:
+                try:
+                    delivery_crew = User.objects.get(pk=delivery_crew_id)
+                except User.DoesNotExist:
+                    return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
+                self.get_object().delivery_crew = delivery_crew
+            self.get_object().status = request.data.get('status', self.get_object().status)
+            if self.get_object().status == 0:
+                self.get_object().status = 1
+            self.get_object().save()
+            return Response(self.serializer_class(self.get_object()).data)
+        elif IsDeliveryCrew().has_permission(request, self):
+            delivery_crew_id = request.user.id
+            if self.get_object().delivery_crew == delivery_crew_id:
+                self.get_object().status = int(request.data.get('status', self.get_object().status))
+                self.get_object().save()
+                return Response(self.serializer_class(self.get_object()).data)
+            else:
+                return Response({"detail": "You are not assigned to this order."}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({'message': 'Access denied'})
 
     def delete(self, request, *args, **kwargs):
-        order = self.get_object()
-        order.delete()
-        return Response({"detail": "Order deleted successfully."}, status=status.HTTP_204_NO_CONTENT)    
+        if IsManager().has_permission(request, self):
+            order = self.get_object()
+            order.delete()
+            return Response({"detail": "Order deleted successfully."}, status=status.HTTP_204_NO_CONTENT)    
+        else:
+            return Response({'message': 'Access denied'})
