@@ -208,8 +208,6 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
                 order = Order.objects.get(pk=self.kwargs['pk'])
             except Order.DoesNotExist:
                 raise Http404("Order does not exist.")
-            # if order.user != self.request.user:
-            #     raise PermissionDenied("You don't have permission to access this order.", code=404)
             return order
         elif IsDeliveryCrew().has_permission(self.request, self):
             pass
