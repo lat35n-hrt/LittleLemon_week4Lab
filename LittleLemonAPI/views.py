@@ -138,7 +138,7 @@ class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
 
     def get_permissions(self):
-        return get_permissions(self, self)
+        return get_permissions(self)
 
     def get_queryset(self):
         return Category.objects.all()
