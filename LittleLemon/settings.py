@@ -142,8 +142,7 @@ REST_FRAMEWORK = {
         'anon': '2/minute',
         'user': '5/minute',
         'ten': '10/minute',
-    }
-
+    },
 }
 
 DJOSER = {

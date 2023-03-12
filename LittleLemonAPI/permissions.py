@@ -1,6 +1,12 @@
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from django.conf import settings
 
+from rest_framework.permissions import BasePermission
+
+class IsAdminUser(BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_superuser
+
 class IsManager(BasePermission):
     def has_permission(self, request, view):
         return request.user.groups.filter(name=settings.MANAGER_GROUP_NAME).exists()
