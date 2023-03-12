@@ -31,9 +31,6 @@ class ManagerUserList(generics.ListCreateAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # tested with invalid email address. it retruend "200 OK". 
-        # return Response(serializer.errors)
-
 
 class ManagerUserDetail(generics.RetrieveDestroyAPIView):
     queryset = User.objects.all()
