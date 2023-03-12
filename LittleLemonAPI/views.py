@@ -6,7 +6,7 @@ from django.http import Http404
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.exceptions import NotFound
 from .models import MenuItem, Category, Cart, Order, OrderItem
 from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer, CartSerializer, OrderSerializer, OrderItemSerializer
 from .permissions import IsManager, get_permissions, IsDeliveryCrew
