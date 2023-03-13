@@ -9,6 +9,9 @@ superuser:
  Password: lemon@789!
  Username: ryan
  Password: lemon@789!
+
+ username: levi 
+ email: levi@littlelemon.com  
 --------------------------
 
  Users (Manager)
@@ -21,6 +24,7 @@ superuser:
  Username: armin
  Password: 
  email: armin@littlelemon.com
+
 --------------------------
 
  Users (Customer - not in Group)
