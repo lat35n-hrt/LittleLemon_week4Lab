@@ -131,9 +131,7 @@ class MenuItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
-
-    def get_permissions(self):
-        return get_permissions(self)
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get_queryset(self):
         return Category.objects.all()
