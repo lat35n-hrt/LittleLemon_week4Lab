@@ -61,15 +61,15 @@ class DeliveryCrewUserList(generics.ListCreateAPIView):
         return User.objects.filter(groups__name=settings.DELIVERYCREW_GROUP_NAME)
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            deliverycrew_group = Group.objects.get(name=settings.DELIVERYCREW_GROUP_NAME)
-            deliverycrew_group.user_set.add(user)
+        username = request.data.get('username', None)
+        if username:
+            user = User.objects.get(username=username)
+            delivery_crew_group = Group.objects.get(name=settings.DELIVERYCREW_GROUP_NAME)
+            delivery_crew_group.user_set.add(user)
+            serializer = self.get_serializer(user)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Username not provided.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeliveryCrewUserDetail(generics.RetrieveDestroyAPIView):

@@ -7,11 +7,16 @@ superuser:
  Users (delivery crew) 
  Username: anna
  Password: lemon@789!
+ 
  Username: ryan
  Password: lemon@789!
 
  username: levi 
  email: levi@littlelemon.com  
+
+ Username: eren
+ Password: lemon@789!
+
 --------------------------
 
  Users (Manager)
@@ -25,15 +30,16 @@ superuser:
  Password: 
  email: armin@littlelemon.com
 
+ Username: gabi
+ Password: lemon@789!
+
+
 --------------------------
 
  Users (Customer - not in Group)
  Username: jan
  Password: lemon@789!
- Username: eren
- Password: lemon@789!
- Username: gabi
- Password: lemon@789!
+ 
 
 
 -----------------
