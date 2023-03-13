@@ -32,7 +32,8 @@ superuser:
  Password: lemon@789!
  Username: eren
  Password: lemon@789!
- 
+ Username: gabi
+ Password: lemon@789!
 
 
 -----------------

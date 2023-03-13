@@ -24,6 +24,8 @@ urlpatterns = [
     path('api/users/me/', UserViewSet.as_view({'get': 'retrieve'}), name='user-retrieve'),
     path('auth/token/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('', include('LittleLemonAPI.urls')),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
 ]
 
 
