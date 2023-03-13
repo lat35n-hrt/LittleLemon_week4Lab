@@ -143,6 +143,7 @@ REST_FRAMEWORK = {
         'user': '5/minute',
         'ten': '10/minute',
     },
+    'APPEND_SLASH': False
 }
 
 DJOSER = {
