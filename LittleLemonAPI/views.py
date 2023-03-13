@@ -9,13 +9,13 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from .models import MenuItem, Category, Cart, Order, OrderItem
 from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer, CartSerializer, OrderSerializer, OrderItemSerializer
-from .permissions import IsManager, get_permissions, IsDeliveryCrew
+from .permissions import IsManager, get_permissions, IsDeliveryCrew, IsAdminUser
 
 
 class ManagerUserList(generics.ListCreateAPIView):
 
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsManager]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get_queryset(self):        
         return User.objects.filter(groups__name=settings.MANAGER_GROUP_NAME)
