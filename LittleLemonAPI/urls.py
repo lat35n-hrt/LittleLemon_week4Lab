@@ -8,7 +8,7 @@ urlpatterns = [
     path('api/groups/delivery-crew/users/<int:pk>', views.DeliveryCrewUserDetail.as_view()),
     path('menu-items', views.MenuItemList.as_view()),
     path('menu-items/<int:pk>', views.MenuItemDetail.as_view()),
-    path('categories', views.CategoryList.as_view()),
+    path('api/categories', views.CategoryList.as_view()),
     path('api/cart/menu-items', views.CartMenuItems.as_view(),),
     path('api/orders', views.OrderList.as_view()),
     path('api/orders/<int:pk>', views.OrderDetail.as_view()),
