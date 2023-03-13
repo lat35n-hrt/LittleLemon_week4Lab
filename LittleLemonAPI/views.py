@@ -268,3 +268,7 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             return Response({"detail": "Order deleted successfully."}, status=status.HTTP_204_NO_CONTENT)    
         else:
             return Response({'message': 'Access denied'})
+
+
+class CartOrder(generics.ListCreateAPIView):
+    pass
