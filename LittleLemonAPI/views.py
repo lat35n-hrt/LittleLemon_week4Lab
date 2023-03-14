@@ -278,4 +278,5 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CartOrder(generics.RetrieveUpdateDestroyAPIView):
-    pass
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
