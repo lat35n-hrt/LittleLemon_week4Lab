@@ -277,5 +277,5 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             return Response({'message': 'Access denied'})
 
 
-class CartOrder(generics.ListCreateAPIView):
+class CartOrder(generics.RetrieveUpdateDestroyAPIView):
     pass
