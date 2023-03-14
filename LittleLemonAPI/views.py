@@ -165,7 +165,14 @@ class OrderList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        if IsAdminUser().has_permission(self.request, self):
+            return Order.objects
+        elif IsManager().has_permission(self.request, self):
+            return Order.objects
+        elif IsDeliveryCrew().has_permission(self.request, self):
+            return Order.objects.filter(delivery_crew=self.request.user)
+        else:
+            return Order.objects.filter(user=self.request.user)
 
     def create_order(self, request):
 
@@ -245,9 +252,13 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             if self.get_object().status == 0:
                 self.get_object().status = 1
             self.get_object().save()
-            return Response(self.serializer_class(self.get_object()).data)
+            return Response(self.serializer_class(self.get_object()).data)        
         elif IsDeliveryCrew().has_permission(request, self):
             delivery_crew_id = request.user.id
+            print("debug now")
+            print(delivery_crew_id)
+            if self.get_object().delivery_crew is None:
+                return Response({"detail": "No delivery crew is assigned to this order."}, status=status.HTTP_404_NOT_FOUND)
             if self.get_object().delivery_crew == delivery_crew_id:
                 self.get_object().status = int(request.data.get('status', self.get_object().status))
                 self.get_object().save()
