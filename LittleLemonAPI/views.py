@@ -39,7 +39,6 @@ class ManagerUserDetail(generics.RetrieveDestroyAPIView):
 
     def get_object(self):
         pk = self.kwargs.get('pk')
-        print(pk)
         user = get_object_or_404(User, pk=pk)
         manager_group = Group.objects.get(name=settings.MANAGER_GROUP_NAME)
         if not user.groups.filter(pk=manager_group.pk).exists():
