@@ -35,7 +35,7 @@ class ManagerUserList(generics.ListCreateAPIView):
 class ManagerUserDetail(generics.RetrieveDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsManager]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get_object(self):
         pk = self.kwargs.get('pk')
@@ -43,7 +43,7 @@ class ManagerUserDetail(generics.RetrieveDestroyAPIView):
         user = get_object_or_404(User, pk=pk)
         manager_group = Group.objects.get(name=settings.MANAGER_GROUP_NAME)
         if not user.groups.filter(pk=manager_group.pk).exists():
-            raise get_object_or_404
+            raise Http404('User does not belong to manager group')
         return user
 
     def delete(self, request, *args, **kwargs):
@@ -280,6 +280,6 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
 class CartOrder(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+    pass
+    # def get_queryset(self):
+    #     return Order.objects.filter(user=self.request.user)
