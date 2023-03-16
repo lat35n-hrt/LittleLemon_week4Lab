@@ -46,11 +46,12 @@ class ManagerUserDetail(generics.RetrieveDestroyAPIView):
             raise Http404('User does not belong to manager group')
         return user
 
+    # delete Manager permission
     def delete(self, request, *args, **kwargs):
         user = self.get_object()
         manager_group = Group.objects.get(name=settings.MANAGER_GROUP_NAME)
         manager_group.user_set.remove(user)
-        return Response(status=status.HTTP_200_OK)
+        return Response({'message': 'Removed Manager permission successfully'}, status=status.HTTP_200_OK)
 
 
 class DeliveryCrewUserList(generics.ListCreateAPIView):
