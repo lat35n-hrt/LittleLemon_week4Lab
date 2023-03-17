@@ -258,8 +258,6 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
         elif IsDeliveryCrew().has_permission(request, self):
             order = self.get_object()
             delivery_crew_id = request.user.id
-            print("debug now")
-            print(delivery_crew_id)
             if order.delivery_crew is None:
                 return Response({"detail": "No delivery crew is assigned to this order."}, status=status.HTTP_404_NOT_FOUND)
             if order.delivery_crew == delivery_crew_id:
