@@ -256,15 +256,16 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
                 order.save()
             return Response(self.serializer_class(order).data)
         elif IsDeliveryCrew().has_permission(request, self):
+            order = self.get_object()
             delivery_crew_id = request.user.id
             print("debug now")
             print(delivery_crew_id)
-            if self.get_object().delivery_crew is None:
+            if order.delivery_crew is None:
                 return Response({"detail": "No delivery crew is assigned to this order."}, status=status.HTTP_404_NOT_FOUND)
-            if self.get_object().delivery_crew == delivery_crew_id:
-                self.get_object().status = int(request.data.get('status', self.get_object().status))
-                self.get_object().save()
-                return Response(self.serializer_class(self.get_object()).data)
+            if order.delivery_crew == delivery_crew_id:
+                order.status = int(request.data.get('status', order.status))
+                order.save()
+                return Response(self.serializer_class(self.order).data)
             else:
                 return Response({"detail": "You are not assigned to this order."}, status=status.HTTP_403_FORBIDDEN)
         else:
