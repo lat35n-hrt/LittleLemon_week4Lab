@@ -249,7 +249,7 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
                     if not delivery_crew:
                         raise User.DoesNotExist
                 except User.DoesNotExist:
-                    return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
+                    return Response({"detail": "Delivery crew does not exist in the delivery crew group."}, status=status.HTTP_404_NOT_FOUND)
  
                 order = self.get_object()
                 order.delivery_crew = delivery_crew
