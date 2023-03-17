@@ -242,6 +242,7 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
             delivery_crew_id = request.data.get('delivery_crew')
+            print('delivery_crew_id:' + str(delivery_crew_id))
             if delivery_crew_id:
                 try:
                     delivery_crew = User.objects.get(pk=delivery_crew_id)
@@ -252,7 +253,7 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             if self.get_object().status == 0:
                 self.get_object().status = 1
             self.get_object().save()
-            return Response(self.serializer_class(self.get_object()).data)        
+            return Response(self.serializer_class(self.get_object()).data)     
         elif IsDeliveryCrew().has_permission(request, self):
             delivery_crew_id = request.user.id
             print("debug now")
