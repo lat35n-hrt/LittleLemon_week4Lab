@@ -246,12 +246,14 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             if delivery_crew_id:
                 try:
                     delivery_crew = User.objects.get(pk=delivery_crew_id)
-                    order = self.get_object()
-                    order.delivery_crew = delivery_crew
-                    order.status = 0 # status = 0 means the order is out for delivery
-                    order.save()
                 except User.DoesNotExist:
                     return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
+ 
+                order = self.get_object()
+                order.delivery_crew = delivery_crew
+                order.status = 0 # status = 0 means the order is out for delivery
+                order.save()
+ 
             return Response(self.serializer_class(order).data)
         elif IsDeliveryCrew().has_permission(request, self):
             delivery_crew_id = request.user.id
