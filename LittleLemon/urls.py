@@ -38,7 +38,7 @@ urlpatterns = [
 
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
-#     # path('api/', include('LittleLemonAPI.urls')),
+#     path('api/', include('LittleLemonAPI.urls')),
 #     path('auth/', include('djoser.urls')),
 #     path('auth/', include('djoser.urls.authtoken')),
 # ]
