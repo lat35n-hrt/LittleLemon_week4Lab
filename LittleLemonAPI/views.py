@@ -252,10 +252,10 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
                 except User.DoesNotExist:
                     return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
                 
-            self.get_object().status = request.data.get('status', self.get_object().status)
-            if self.get_object().status == 0:
-                self.get_object().status = 1
-            self.get_object().save()
+            order.status = request.data.get('status', order.status)
+            if order.status == 0:
+                order.status = 1
+            order.save()
             return Response(self.serializer_class(self.get_object()).data)     
         elif IsDeliveryCrew().has_permission(request, self):
             delivery_crew_id = request.user.id
