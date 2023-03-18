@@ -246,7 +246,7 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             if order.delivery_crew.id == delivery_crew_id:
                 order.status = int(request.data.get('status', order.status))
                 order.save()
-                return Response(self.serializer_class(self.order).data)
+                return Response(self.serializer_class(order).data)
             else:
                 return Response({"detail": "You are not assigned to this order."}, status=status.HTTP_403_FORBIDDEN)
         else:
