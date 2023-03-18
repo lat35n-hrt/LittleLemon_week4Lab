@@ -237,11 +237,13 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             return Response(self.serializer_class(order).data)
         elif IsDeliveryCrew().has_permission(request, self):
             order = self.get_object()
-            print(request.user.id)
+            print("request.user.id:", request.user.id)
+            print("order.delivery_crew:", order.delivery_crew.id)
+            #order.delivery_crew returns username
             delivery_crew_id = request.user.id
-            if order.delivery_crew is None:
+            if order.delivery_crew.id is None:
                 return Response({"detail": "No delivery crew is assigned to this order."}, status=status.HTTP_404_NOT_FOUND)
-            if order.delivery_crew == delivery_crew_id:
+            if order.delivery_crew.id == delivery_crew_id:
                 order.status = int(request.data.get('status', order.status))
                 order.save()
                 return Response(self.serializer_class(self.order).data)
