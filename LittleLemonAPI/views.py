@@ -221,24 +221,6 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
                 raise PermissionDenied("You don't have permission to access this order.", code=404)
             return order
 
-    def put(self, request, *args, **kwargs):
-        if IsManager().has_permission(request, self):
-            delivery_crew_id = request.data.get('delivery_crew')
-            if delivery_crew_id:
-                try:
-                    delivery_crew = User.objects.get(pk=delivery_crew_id)
-                except User.DoesNotExist:
-                    return Response({"detail": "Delivery crew does not exist."}, status=status.HTTP_404_NOT_FOUND)
-                self.get_object().delivery_crew = delivery_crew
-                if self.get_object().status == 0:
-                    self.get_object().status = 1
-            else:
-                self.get_object().status = request.data.get('status', self.get_object().status)
-            self.get_object().save()
-            return Response(self.serializer_class(self.get_object()).data)
-        else:
-            return Response({'message': 'Access denied'})
-
     def patch(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
             delivery_crew_id = request.data.get('delivery_crew')
@@ -257,6 +239,7 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             return Response(self.serializer_class(order).data)
         elif IsDeliveryCrew().has_permission(request, self):
             order = self.get_object()
+            print(request.user.id)
             delivery_crew_id = request.user.id
             if order.delivery_crew is None:
                 return Response({"detail": "No delivery crew is assigned to this order."}, status=status.HTTP_404_NOT_FOUND)
