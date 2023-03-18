@@ -17,6 +17,15 @@ superuser:
  Username: eren
  Password: lemon@789!
 
+ test1
+ id: 11
+
+ test2
+ id: 12
+
+test13
+ id: 13
+
 --------------------------
 
  Users (Manager)
@@ -41,14 +50,11 @@ superuser:
 
  Users (Customer - not in Group)
 
- test1
- id: 11
 
- test2
- id: 12
 
- test13
- id: 13
+
+
+ 
 
 
 -----------------

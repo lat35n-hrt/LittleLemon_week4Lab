@@ -203,14 +203,12 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
     # No need for Customer to PUT and PATCH here
 
     def get_object(self):
-        if IsManager().has_permission(self.request, self):
+        if IsManager().has_permission(self.request, self) or IsDeliveryCrew().has_permission(self.request, self):
             try:
                 order = Order.objects.get(pk=self.kwargs['pk'])
             except Order.DoesNotExist:
                 raise Http404("Order does not exist.")
             return order
-        elif IsDeliveryCrew().has_permission(self.request, self):
-            pass
         else:
         #isCustomer    
             try:
