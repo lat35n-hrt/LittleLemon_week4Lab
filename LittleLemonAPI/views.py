@@ -101,7 +101,7 @@ class MenuItemList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         search = self.request.query_params.get('search', None)
-        queryset = self.queryset
+        queryset = super().get_queryset()
         if search is not None:
             return queryset.filter(category__title__icontains=search)
         else:
