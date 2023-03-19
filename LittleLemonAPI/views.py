@@ -96,7 +96,16 @@ class DeliveryCrewUserDetail(generics.RetrieveDestroyAPIView):
 class MenuItemList(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated]
+    search_fields = ['category']
+
+    def get_queryset(self):
+        search = self.request.query_params.get('search', None)
+        queryset = self.queryset
+        if search is not None:
+            return queryset.filter(category__title__icontains=search)
+        else:
+            return queryset
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
