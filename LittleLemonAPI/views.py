@@ -3,7 +3,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from rest_framework import generics, status
+from rest_framework import generics, status, pagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
@@ -12,10 +12,18 @@ from .serializers import UserSerializer, MenuItemSerializer, CategorySerializer,
 from .permissions import IsManager, get_permissions, IsDeliveryCrew, IsAdminUser
 
 
+class MenuItemPagination(pagination.PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+    last_page_strings = ('last',)
+
+
 class ManagerUserList(generics.ListCreateAPIView):
 
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
+    pagination_class = MenuItemPagination
 
     def get_queryset(self):        
         return User.objects.filter(groups__name=settings.MANAGER_GROUP_NAME)
@@ -56,6 +64,7 @@ class ManagerUserDetail(generics.RetrieveDestroyAPIView):
 class DeliveryCrewUserList(generics.ListCreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsManager]
+    pagination_class = MenuItemPagination
 
     def get_queryset(self):        
         return User.objects.filter(groups__name=settings.DELIVERYCREW_GROUP_NAME)
@@ -98,6 +107,7 @@ class MenuItemList(generics.ListCreateAPIView):
     serializer_class = MenuItemSerializer
     permission_classes = [IsAuthenticated]
     search_fields = ['category']
+    pagination_class = MenuItemPagination
 
     def get_queryset(self):
         search = self.request.query_params.get('search', None)
@@ -141,6 +151,7 @@ class MenuItemDetail(generics.RetrieveUpdateDestroyAPIView):
 class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = MenuItemPagination
 
     def get_queryset(self):
         return Category.objects.all()
@@ -157,6 +168,7 @@ class CategoryList(generics.ListCreateAPIView):
 class CartMenuItems(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CartSerializer
+    pagination_class = MenuItemPagination
 
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
@@ -172,6 +184,7 @@ class CartMenuItems(generics.ListCreateAPIView):
 class OrderList(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = MenuItemPagination
 
     def get_queryset(self):
         if IsAdminUser().has_permission(self.request, self):
@@ -273,6 +286,7 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
 class CartOrder(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = MenuItemPagination
     pass
     # def get_queryset(self):
     #     return Order.objects.filter(user=self.request.user)
