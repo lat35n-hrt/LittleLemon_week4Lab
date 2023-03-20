@@ -13,7 +13,7 @@ from .permissions import IsManager, get_permissions, IsDeliveryCrew, IsAdminUser
 
 
 class MenuItemPagination(pagination.PageNumberPagination):
-    page_size = 3
+    page_size = 5
     page_size_query_param = 'page_size'
     max_page_size = 100
     last_page_strings = ('last',)
@@ -110,12 +110,14 @@ class MenuItemList(generics.ListCreateAPIView):
     pagination_class = MenuItemPagination
 
     def get_queryset(self):
-        search = self.request.query_params.get('search', None)
         queryset = super().get_queryset()
+        search = self.request.query_params.get('search', None)
         if search is not None:
-            return queryset.filter(category__title__icontains=search)
-        else:
-            return queryset
+            queryset = queryset.filter(category__title__icontains=search)
+        ordering = self.request.query_params.get('ordering', None)
+        if ordering is not None:
+            queryset = queryset.order_by(ordering)
+        return queryset
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
