@@ -19,6 +19,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['slug', 'title']
 
 class CartSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         model = Cart
         fields = ['user', 'menuitem', 'quantity', 'unit_price', 'price']
