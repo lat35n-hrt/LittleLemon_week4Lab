@@ -176,8 +176,21 @@ class CartMenuItems(generics.ListCreateAPIView):
         return Cart.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        unit_price = serializer.validated_data['unit_price']
+        quantity = serializer.validated_data['quantity']
+        serializer.save(user=self.request.user, price=unit_price * quantity)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        else:
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        
     def delete(self, request, *args, **kwargs):
         cart_items = Cart.objects.filter(user=request.user)
         cart_items.delete()
@@ -292,8 +305,3 @@ class CartOrder(generics.RetrieveUpdateDestroyAPIView):
     pass
     # def get_queryset(self):
     #     return Order.objects.filter(user=self.request.user)
-
-class CartOrderMenuItem(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
-    pagination_class = MenuItemPagination
