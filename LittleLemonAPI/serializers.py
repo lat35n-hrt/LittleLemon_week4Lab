@@ -24,6 +24,10 @@ class CartSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
+    def validate(self, attrs):
+        attrs['price'] = attrs['quantity'] * attrs['unit_price']
+        return attrs
+
     class Meta:
         model = Cart
         fields = ['user', 'menuitem', 'quantity', 'unit_price', 'price']
