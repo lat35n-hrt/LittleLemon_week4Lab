@@ -44,4 +44,7 @@ class OrderSerializer(serializers.ModelSerializer):
     orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
     class Meta:
         model = Order
-        fields = ['id','user', 'delivery_crew', 'status', 'total', 'date', 'oderitem']
+        fields = ['id','user', 'delivery_crew', 'status', 'total', 'date', 'orderitem']
+        extra_kwargs = {
+            'date': {'read_only': False}
+        }
