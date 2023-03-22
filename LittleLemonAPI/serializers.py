@@ -35,12 +35,13 @@ class CartSerializer(serializers.ModelSerializer):
             'price': {'read_only': True}
         }
 
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['user', 'delivery_crew', 'status', 'total', 'date']
-
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['order', 'menuitem', 'quantity', 'unit_price', 'price']
+
+class OrderSerializer(serializers.ModelSerializer):
+    orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
+    class Meta:
+        model = Order
+        fields = ['id','user', 'delivery_crew', 'status', 'total', 'date', 'oderitem']
