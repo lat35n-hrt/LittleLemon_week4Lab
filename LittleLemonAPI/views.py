@@ -228,13 +228,14 @@ class OrderList(generics.ListCreateAPIView):
 
             for item in items.values():
                 orderitem = OrderItem(
-                    # order=order,
                     order=request.user,
                     menuitem_id=item['menuitem_id'],
                     price=item['price'],
                     quantity=item['quantity'],
                 )
+                print("before save")
                 orderitem.save()
+                print("after save")
 
             Cart.objects.all().filter(user=self.request.user).delete() #Delete cart items
 

@@ -41,7 +41,7 @@ class CartSerializer(serializers.ModelSerializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ['order', 'menuitem', 'quantity', 'unit_price', 'price']
+        fields = ['order', 'menuitem', 'quantity', 'price']
 
 class OrderSerializer(serializers.ModelSerializer):
     orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
