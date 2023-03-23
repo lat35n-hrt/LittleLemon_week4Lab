@@ -342,6 +342,7 @@ class CartOrder(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = MenuItemPagination
-    pass
-    # def get_queryset(self):
-    #     return Order.objects.filter(user=self.request.user)
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)

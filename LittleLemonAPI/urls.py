@@ -11,6 +11,6 @@ urlpatterns = [
     path('categories', views.CategoryList.as_view()),
     path('orders', views.OrderList.as_view()),
     path('orders/<int:pk>', views.OrderDetail.as_view()),
-    path('cart/orders', views.CartOrder.as_view()),
+    path('cart/orders/<int:id>', views.CartOrder.as_view()),
     path('cart/menu-items', views.CartMenuItems.as_view()),
 ]
