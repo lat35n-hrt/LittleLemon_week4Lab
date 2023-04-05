@@ -51,4 +51,4 @@ class OrderItem(models.Model):
         unique_together = ('order', 'menuitem')
 
     def __str__(self):
-        return self.order.username + '_' + self.menuitem.title
+        return str(self.order) + '_' + self.menuitem.title
