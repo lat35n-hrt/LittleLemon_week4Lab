@@ -39,6 +39,8 @@ class CartSerializer(serializers.ModelSerializer):
         }
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
+
     class Meta:
         model = OrderItem
         fields = ['order', 'menuitem', 'quantity', 'price']

@@ -228,7 +228,7 @@ class OrderList(generics.ListCreateAPIView):
 
             for item in items.values():
                 orderitem = OrderItem(
-                    order=request.user,
+                    order = order,
                     menuitem_id=item['menuitem_id'],
                     price=item['price'],
                     quantity=item['quantity'],
