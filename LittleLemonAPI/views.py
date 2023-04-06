@@ -3,6 +3,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from datetime import date
 from rest_framework import generics, status, pagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -211,67 +212,67 @@ class OrderList(generics.ListCreateAPIView):
         else:
             return Order.objects.filter(user=self.request.user)
 
-    def create(self, request, *args, **kwargs):
-        menuitem_count = Cart.objects.all().filter(user=self.request.user).count()
-        if menuitem_count == 0:
-            return Response({"message:": "no item in cart"})
+    # def create(self, request, *args, **kwargs):
+    #     menuitem_count = Cart.objects.all().filter(user=self.request.user).count()
+    #     if menuitem_count == 0:
+    #         return Response({"message:": "no item in cart"})
 
-        data = request.data.copy()
-        total = self.get_total_price(self.request.user)
-        data['total'] = total
-        data['user'] = self.request.user.id
-        order_serializer = OrderSerializer(data=data)
-        if (order_serializer.is_valid()):
-            order = order_serializer.save()
+    #     data = request.data.copy()
+    #     total = self.get_total_price(self.request.user)
+    #     data['total'] = total
+    #     data['user'] = self.request.user.id
+    #     order_serializer = OrderSerializer(data=data)
+    #     if (order_serializer.is_valid()):
+    #         order = order_serializer.save()
 
-            items = Cart.objects.all().filter(user=self.request.user).all()
+    #         items = Cart.objects.all().filter(user=self.request.user).all()
 
-            for item in items.values():
-                orderitem = OrderItem(
-                    order = order,
-                    menuitem_id=item['menuitem_id'],
-                    price=item['price'],
-                    quantity=item['quantity'],
-                )
-                print("before save")
-                orderitem.save()
-                print("after save")
+    #         for item in items.values():
+    #             orderitem = OrderItem(
+    #                 order = order,
+    #                 menuitem_id=item['menuitem_id'],
+    #                 price=item['price'],
+    #                 quantity=item['quantity'],
+    #             )
+    #             print("before save")
+    #             orderitem.save()
+    #             print("after save")
 
-            Cart.objects.all().filter(user=self.request.user).delete() #Delete cart items
+    #         Cart.objects.all().filter(user=self.request.user).delete() #Delete cart items
 
-            result = order_serializer.data.copy()
-            result['total'] = total
-            return Response(order_serializer.data)
+    #         result = order_serializer.data.copy()
+    #         result['total'] = total
+    #         return Response(order_serializer.data)
     
-    def get_total_price(self, user):
-        total = 0
-        items = Cart.objects.all().filter(user=user).all()
-        for item in items.values():
-            total += item['price']
-        return total
+    # def get_total_price(self, user):
+    #     total = 0
+    #     items = Cart.objects.all().filter(user=user).all()
+    #     for item in items.values():
+    #         total += item['price']
+    #     return total
 
+    def create_order(self, request):
 
-    # def create_order(self, request):
+        cart_items = Cart.objects.filter(user=request.user)
+        order = Order.objects.create(user=request.user, total=0, status=False)
 
-    #     cart_items = Cart.objects.filter(user=request.user)
-    #     order = Order.objects.create(user=request.user, total=0, status=False)
+        for cart_item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                menuitem=cart_item.menuitem,
+                quantity=cart_item.quantity,
+                unit_price=cart_item.menuitem.price,
+                price=cart_item.quantity * cart_item.menuitem.price
+            )
 
-    #     for cart_item in cart_items:
-    #         OrderItem.objects.create(
-    #             order=order,
-    #             menuitem=cart_item.menuitem,
-    #             quantity=cart_item.quantity,
-    #             unit_price=cart_item.menuitem.price,
-    #             price=cart_item.quantity * cart_item.menuitem.price
-    #         )
+        order.total = sum(item.price for item in order.orderitem_set.all())
+        order.save()
 
-    #     order.total = sum(item.price for item in order.orderitem_set.all())
-    #     order.save()
+        cart_items.delete()
 
-    #     cart_items.delete()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
 
-    #     serializer = OrderSerializer(order)
-    #     return Response(serializer.data)
 
 
 class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
