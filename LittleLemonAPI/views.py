@@ -262,22 +262,24 @@ class OrderList(generics.ListCreateAPIView):
             "date": date.today()
         }
 
-        for cart_item in cart_items:
-            OrderItem.objects.create(
-                order=order,
-                menuitem=cart_item.menuitem,
-                quantity=cart_item.quantity,
-                unit_price=cart_item.menuitem.price,
-                price=cart_item.quantity * cart_item.menuitem.price
-            )
+        order_serializer = OrderSerializer(data=data)
+        if (order_serializer.is_valid()):
+            for cart_item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    menuitem=cart_item.menuitem,
+                    quantity=cart_item.quantity,
+                    unit_price=cart_item.menuitem.price,
+                    price=cart_item.quantity * cart_item.menuitem.price
+                )
 
-        order.save()
+            order.save()
 
-        cart_items.delete()
+            cart_items.delete()
 
-        serializer = OrderSerializer(order)
-        return Response(serializer.data)
-
+            serializer = OrderSerializer(order)
+            return Response(serializer.data)
+        return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
