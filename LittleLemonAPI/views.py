@@ -212,6 +212,7 @@ class OrderList(generics.ListCreateAPIView):
         else:
             return Order.objects.filter(user=self.request.user)
 
+    # From the answer on Coursera 
     # def create(self, request, *args, **kwargs):
     #     menuitem_count = Cart.objects.all().filter(user=self.request.user).count()
     #     if menuitem_count == 0:
