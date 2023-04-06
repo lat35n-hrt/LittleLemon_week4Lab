@@ -270,7 +270,6 @@ class OrderList(generics.ListCreateAPIView):
                     order=order,
                     menuitem=cart_item.menuitem,
                     quantity=cart_item.quantity,
-                    unit_price=cart_item.menuitem.price,
                     price=cart_item.quantity * cart_item.menuitem.price
                 )
 
