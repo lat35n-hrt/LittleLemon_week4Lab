@@ -252,7 +252,7 @@ class OrderList(generics.ListCreateAPIView):
     #         total += item['price']
     #     return total
 
-    def create_order(self, request):
+    def create(self, request, *args, **kwargs):
         cart_items = Cart.objects.filter(user=request.user)
         total_price = sum(item.price for item in cart_items) 
         data = {
