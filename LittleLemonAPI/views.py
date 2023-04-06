@@ -255,7 +255,11 @@ class OrderList(generics.ListCreateAPIView):
     def create_order(self, request):
 
         cart_items = Cart.objects.filter(user=request.user)
-        
+        total_price = sum(item.price for item in cart_items) 
+        data = {
+            "user": self.request.user.id,
+            "total": total_price,
+        }
 
         for cart_item in cart_items:
             OrderItem.objects.create(
@@ -266,7 +270,6 @@ class OrderList(generics.ListCreateAPIView):
                 price=cart_item.quantity * cart_item.menuitem.price
             )
 
-        order.total = sum(item.price for item in order.orderitem_set.all())
         order.save()
 
         cart_items.delete()
