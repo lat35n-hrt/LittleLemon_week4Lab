@@ -253,7 +253,6 @@ class OrderList(generics.ListCreateAPIView):
     #     return total
 
     def create_order(self, request):
-
         cart_items = Cart.objects.filter(user=request.user)
         total_price = sum(item.price for item in cart_items) 
         data = {
@@ -261,7 +260,6 @@ class OrderList(generics.ListCreateAPIView):
             "total": total_price,
             "date": date.today()
         }
-
         order_serializer = OrderSerializer(data=data)
         if (order_serializer.is_valid()):
             order = order_serializer.save()
@@ -272,11 +270,8 @@ class OrderList(generics.ListCreateAPIView):
                     quantity=cart_item.quantity,
                     price=cart_item.quantity * cart_item.menuitem.price
                 )
-
             order.save()
-
             cart_items.delete()
-
             serializer = OrderSerializer(order)
             return Response(serializer.data)
         return Response(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
