@@ -255,7 +255,7 @@ class OrderList(generics.ListCreateAPIView):
     def create_order(self, request):
 
         cart_items = Cart.objects.filter(user=request.user)
-        order = Order.objects.create(user=request.user, total=0, status=False)
+        
 
         for cart_item in cart_items:
             OrderItem.objects.create(
