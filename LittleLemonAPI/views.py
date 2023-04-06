@@ -256,7 +256,7 @@ class OrderList(generics.ListCreateAPIView):
         cart_items = Cart.objects.filter(user=request.user)
         total_price = sum(item.price for item in cart_items) 
         data = {
-            "user": self.request.user.id,
+            "user": request.user.id,
             "total": total_price,
             "date": date.today()
         }
