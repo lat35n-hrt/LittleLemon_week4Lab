@@ -259,6 +259,7 @@ class OrderList(generics.ListCreateAPIView):
         data = {
             "user": self.request.user.id,
             "total": total_price,
+            "date": date.today()
         }
 
         for cart_item in cart_items:
