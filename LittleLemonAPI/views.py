@@ -264,6 +264,7 @@ class OrderList(generics.ListCreateAPIView):
 
         order_serializer = OrderSerializer(data=data)
         if (order_serializer.is_valid()):
+            order = order_serializer.save()
             for cart_item in cart_items:
                 OrderItem.objects.create(
                     order=order,
