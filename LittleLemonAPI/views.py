@@ -254,6 +254,9 @@ class OrderList(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         cart_items = Cart.objects.filter(user=request.user)
+        if not cart_items:
+            return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+    
         total_price = sum(item.price for item in cart_items) 
         data = {
             "user": request.user.id,
